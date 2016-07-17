@@ -1,5 +1,7 @@
 "use strict";
 
+const colors = require('colors');
+
 class Entidad {
 	constructor(nombre, x, y, vida, f_ataque, velocidad_ataque, rango, movimiento) {
 		this.nombre = nombre;
@@ -13,15 +15,14 @@ class Entidad {
 	}
 
 	static distancia(a, b) {
-		const dx = a.posicion_x-b.posicion_x;
-		const dy = a.posicion_y-b.posicion_y;
-		const d = Math.sqrt(dx*dx + dy*dy);
+		var dx = a.posicion_x - b.posicion_x;
+		var dy = a.posicion_y - b.posicion_y;
+		var d = Math.sqrt(dx*dx + dy*dy);
 		return d;
 	}
 
 	atacar(objetivo) {
 		objetivo.vida -= this.f_ataque/this.v_ataque;
-		console.log(this.nombre+" atacando a "+objetivo.nombre);
 	}
 
 	ir_a(objetivo) {
@@ -39,39 +40,52 @@ class Entidad {
 			// Si esta por debajo, que suba
 			this.posicion_y -= this.v_movimiento;
 		}
-		console.log(this.nombre+" ("+this.posicion_x+"; "+this.posicion_y+")");
+		switch(this.nombre) {
+			case "p1":
+				console.log((this.nombre+" ("+this.posicion_x+"; "+this.posicion_y+")").red);
+				break;
+			case "p2":
+				console.log((this.nombre+" ("+this.posicion_x+"; "+this.posicion_y+")").blue);
+				break;
+			default:
+				console.log(this.nombre+" ("+this.posicion_x+"; "+this.posicion_y+")");
+				break;
+		}
 	}
 
 	ver_en_rango(objetivo) {
-		if (this.distancia(this, objetivo) <= this.alcance) {
+		if (Entidad.distancia(this, objetivo) <= this.alcance) {
 			return true;
+		} else {
+			return false;
 		}
 	}
 
 }
 
-var p1 = new Entidad("p1",20, 10, 1000, 120, 1.1, 2, 5);
-var p2 = new Entidad("p2",22, 15, 1000, 150, 1.4, 2, 5);
+var p1 = new Entidad("p1",Math.floor((Math.random()*100)+1), Math.floor((Math.random()*100)+1), 1000, 120, 1.1, 1, 5);
+var p2 = new Entidad("p2",Math.floor((Math.random()*100)+1), Math.floor((Math.random()*100)+1), 1000, 150, 1.4, 1, 5);
 
+console.log("-------------xxxx-------------".white);
 var juego = setInterval(function(){
 
 	if (p1.vida > 0 && p2.vida > 0) {
 		p1.ir_a(p2);
-		console.log("Vida de p2: "+p2.vida);
-		if (p1.ver_en_rango) {
+		console.log(("Vida de p2: "+p2.vida).red);
+		if (p1.ver_en_rango(p2)) {
 			p1.atacar(p2);
 		}
 		p2.ir_a(p1);
-		console.log("Vida de p1: "+p1.vida);
-		if (p2.ver_en_rango) {
+		console.log(("Vida de p1: "+p1.vida).blue);
+		if (p2.ver_en_rango(p1)) {
 			p2.atacar(p1);
 		}
 	} else if (p1.vida <=0 ) {
-		console.log("Gano p1");
+		console.log("Gano p1".blue);
 		clearInterval(juego);
 	} else if (p2.vida <=0 ) {
-		console.log("Gano p2");
+		console.log("Gano p2".red);
 		clearInterval(juego);
 	}
-
+	console.log("-------------xxxx-------------".white);
 },1000)
