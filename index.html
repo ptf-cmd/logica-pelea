@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Batalla</title>
+        <script src="JS/phaser.min.js"></script>
+        <style type="text/css">
+           body{
+               margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+
+    <script type="text/javascript">
+
+    window.onload = function() {
+
+        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+        
+        function distancia(a, b) {
+            var x = Math.abs(a.posicion_x-b.posicion_x);
+            var y = Math.abs(a.posicion_y-b.posicion_y);
+            var d = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+            return d;
+        }
+
+        var intervalo_ataque_caballero;
+        var intervalo_movimiento_caballero;
+        var intervalo_ataque_arquera;
+        var intervalo_movimiento_arquera;
+
+        function preload () {
+
+            game.load.image('fondo', 'IMG/fondo2.jpg');
+            game.load.image('caballero', 'IMG/caballero-min.png');
+            game.load.image('arquera', 'IMG/arquera-min.png');
+
+        }
+        
+	
+        function create () {
+            /*Creamos el fondo con la imagen precargada en preload y con las
+            coordenadas x=0,y=0*/
+            var fondo = game.add.sprite(0, 0, 'fondo');
+            
+            var caballero = {
+                nombre: "caballero",
+                vida: 1056,
+                f_ataque: 120,
+                f_defensa:0,
+                velocidad_ataque: 1.1,
+                velocidad_movimiento: 5,
+                alcance: 1,
+                vivo: true,
+                posicion_x: Math.floor((Math.random()*(700 - 100))+100),
+                posicion_y: Math.floor((Math.random()*(500 - 100))+100),
+                ir_a_objetivo: function(objetivo) {
+		var _this = this;
+		intervalo_movimiento_caballero =  setInterval(function(){
+			if (objetivo.posicion_x>_this.posicion_x+_this.alcance) {
+				// Si esta por izquiera en x, que se mueva a la der
+				_this.posicion_x += _this.velocidad_movimiento;
+			} else if(objetivo.posicion_x<_this.posicion_x-_this.alcance) {
+				// Si esta por derecha en x, que se mueva a la izq
+				_this.posicion_x -= _this.velocidad_movimiento;
+			}
+			if (objetivo.posicion_y>_this.posicion_y+_this.alcance) {
+				// Si esta por arriba en y, que baje
+				_this.posicion_y += _this.velocidad_movimiento
+			} else if(objetivo.posicion_y<_this.posicion_y-_this.alcance) {
+				// Si esta por debajo, que suba
+				_this.posicion_y -= _this.velocidad_movimiento;
+			}
+			windows.alert(_this.nombre+" ("+_this.posicion_x+"; "+_this.posicion_y+")");
+		},1000);
+	},
+            }
+        
+            var arquera = {
+                nombre: "arquera",
+                vida: 200,
+                f_ataque: 64,
+                f_defensa:0,
+                velocidad_ataque: 1.2,
+                velocidad_movimiento: 5,
+                alcance: 5,
+                vivo: true,
+                posicion_x: Math.floor((Math.random()*(700 - 100))+100),
+                posicion_y: Math.floor((Math.random()*(500 - 100))+100),
+            }
+            var caballero = game.add.sprite(caballero.posicion_x, caballero.posicion_y, 'caballero');
+            var arquera = game.add.sprite(arquera.posicion_x, arquera.posicion_y, 'arquera');
+
+        }
+        
+        caballero.ir_a_objetivo(arquera);
+        
+        function update () {
+            
+        }
+
+    };
+
+    </script>
+
+    </body>
+</html>
