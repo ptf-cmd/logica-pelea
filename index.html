@@ -38,13 +38,7 @@
 
         }
         
-	
-        function create () {
-            /*Creamos el fondo con la imagen precargada en preload y con las
-            coordenadas x=0,y=0*/
-            var fondo = game.add.sprite(0, 0, 'fondo');
-            
-            var caballero = {
+	var caballero = {
                 nombre: "caballero",
                 vida: 1056,
                 f_ataque: 120,
@@ -89,8 +83,14 @@
                 posicion_x: Math.floor((Math.random()*(700 - 100))+100),
                 posicion_y: Math.floor((Math.random()*(500 - 100))+100),
             }
-            var caballero = game.add.sprite(caballero.posicion_x, caballero.posicion_y, 'caballero');
-            var arquera = game.add.sprite(arquera.posicion_x, arquera.posicion_y, 'arquera');
+        function create () {
+            /*Creamos el fondo con la imagen precargada en preload y con las
+            coordenadas x=0,y=0*/
+            var fondo = game.add.sprite(0, 0, 'fondo');
+            
+            
+            var caballeroRender = game.add.sprite(caballero.posicion_x, caballero.posicion_y, 'caballero');
+            var arqueraRender = game.add.sprite(arquera.posicion_x, arquera.posicion_y, 'arquera');
 
         }
         
