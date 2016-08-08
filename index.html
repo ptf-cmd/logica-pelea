@@ -13,14 +13,34 @@
     <body>
 
     <script type="text/javascript">
-
+    var ir_a = function (objetivo) {
+      var _this = this;
+      intervalo_movimiento_caballero =  setInterval(function(){
+        if (objetivo.x>_this.x+_this.alcance) {
+          // Si esta por izquiera en x, que se mueva a la der
+          _this.x += _this.velocidad_movimiento;
+        } else if(objetivo.x<_this.x-_this.alcance) {
+          // Si esta por derecha en x, que se mueva a la izq
+          _this.x -= _this.velocidad_movimiento;
+        }
+        if (objetivo.y>_this.y+_this.alcance) {
+          // Si esta por arriba en y, que baje
+          _this.y += _this.velocidad_movimiento
+        } else if(objetivo.y<_this.y-_this.alcance) {
+          // Si esta por debajo, que suba
+          _this.y -= _this.velocidad_movimiento;
+        }
+        windows.alert(_this.nombre+" ("+_this.x+"; "+_this.y+")");
+      },1000);
+    };
+    var caballeroRender;
     window.onload = function() {
 
         var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-        
+
         function distancia(a, b) {
-            var x = Math.abs(a.posicion_x-b.posicion_x);
-            var y = Math.abs(a.posicion_y-b.posicion_y);
+            var x = Math.abs(a.x-b.x);
+            var y = Math.abs(a.y-b.y);
             var d = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
             return d;
         }
@@ -37,8 +57,7 @@
             game.load.image('arquera', 'IMG/arquera-min.png');
 
         }
-        
-	var caballero = {
+	/*var caballero = {
                 nombre: "caballero",
                 vida: 1056,
                 f_ataque: 120,
@@ -47,30 +66,30 @@
                 velocidad_movimiento: 5,
                 alcance: 1,
                 vivo: true,
-                posicion_x: Math.floor((Math.random()*(700 - 100))+100),
-                posicion_y: Math.floor((Math.random()*(500 - 100))+100),
+                x: Math.floor((Math.random()*(700 - 100))+100),
+                y: Math.floor((Math.random()*(500 - 100))+100),
                 ir_a_objetivo: function(objetivo) {
 		var _this = this;
 		intervalo_movimiento_caballero =  setInterval(function(){
-			if (objetivo.posicion_x>_this.posicion_x+_this.alcance) {
+			if (objetivo.x>_this.x+_this.alcance) {
 				// Si esta por izquiera en x, que se mueva a la der
-				_this.posicion_x += _this.velocidad_movimiento;
-			} else if(objetivo.posicion_x<_this.posicion_x-_this.alcance) {
+				_this.x += _this.velocidad_movimiento;
+			} else if(objetivo.x<_this.x-_this.alcance) {
 				// Si esta por derecha en x, que se mueva a la izq
-				_this.posicion_x -= _this.velocidad_movimiento;
+				_this.x -= _this.velocidad_movimiento;
 			}
-			if (objetivo.posicion_y>_this.posicion_y+_this.alcance) {
+			if (objetivo.y>_this.y+_this.alcance) {
 				// Si esta por arriba en y, que baje
-				_this.posicion_y += _this.velocidad_movimiento
-			} else if(objetivo.posicion_y<_this.posicion_y-_this.alcance) {
+				_this.y += _this.velocidad_movimiento
+			} else if(objetivo.y<_this.y-_this.alcance) {
 				// Si esta por debajo, que suba
-				_this.posicion_y -= _this.velocidad_movimiento;
+				_this.y -= _this.velocidad_movimiento;
 			}
-			windows.alert(_this.nombre+" ("+_this.posicion_x+"; "+_this.posicion_y+")");
+			windows.alert(_this.nombre+" ("+_this.x+"; "+_this.y+")");
 		},1000);
 	},
-            }
-        
+}*/
+
             var arquera = {
                 nombre: "arquera",
                 vida: 200,
@@ -80,24 +99,32 @@
                 velocidad_movimiento: 5,
                 alcance: 5,
                 vivo: true,
-                posicion_x: Math.floor((Math.random()*(700 - 100))+100),
-                posicion_y: Math.floor((Math.random()*(500 - 100))+100),
+                x: Math.floor((Math.random()*(700 - 100))+100),
+                y: Math.floor((Math.random()*(500 - 100))+100),
             }
-        function create () {
-            /*Creamos el fondo con la imagen precargada en preload y con las
-            coordenadas x=0,y=0*/
-            var fondo = game.add.sprite(0, 0, 'fondo');
-            
-            
-            var caballeroRender = game.add.sprite(caballero.posicion_x, caballero.posicion_y, 'caballero');
-            var arqueraRender = game.add.sprite(arquera.posicion_x, arquera.posicion_y, 'arquera');
+            function create () {
+                /*Creamos el fondo con la imagen precargada en preload y con las
+                coordenadas x=0,y=0*/
+                var fondo = game.add.sprite(0, 0, 'fondo');
 
-        }
-        
-        caballero.ir_a_objetivo(arquera);
-        
+
+                caballeroRender = game.add.sprite(Math.floor((Math.random()*(700 - 100))+100),Math.floor((Math.random()*(500 - 100))+100), 'caballero');
+                caballeroRender.vida = 1056;
+                caballeroRender.f_ataque =120;
+                caballeroRender.velocidad_ataque = 1.1;
+                caballeroRender.velocidad_movimiento = 5;
+                caballeroRender.alcance = 1;
+                caballeroRender.vivo = true;
+                caballeroRender.ir_a_objetivo = ir_a
+                console.log(caballeroRender);
+                arqueraRender = game.add.sprite(arquera.x, arquera.y, 'arquera');
+                caballeroRender.ir_a_objetivo(arquera);
+            }
+
+
+
         function update () {
-            
+
         }
 
     };
