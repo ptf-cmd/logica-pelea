@@ -13,7 +13,23 @@
     <body>
 
     <script type="text/javascript">
-    var ir_a = function (objetivo) {
+    
+    function distancia(a, b) {
+        var x = Math.abs(a.x-b.x);
+        var y = Math.abs(a.y-b.y);
+        var d = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+        return d;
+    }
+
+    // VARIABLES DE LOS INTERVALOS DE TIEMPO
+    var intervalo_ataque_caballero;
+    var intervalo_movimiento_caballero;
+    var intervalo_ataque_arquera;
+    var intervalo_movimiento_arquera;
+
+    // FUNCIONES AUXILIARES
+    function ir_a(objetivo) {
+      // Usamos this para referirnos a quien este llamndo la funcion
       var _this = this;
       intervalo_movimiento_caballero =  setInterval(function(){
         if (objetivo.x>_this.x+_this.alcance) {
@@ -30,104 +46,106 @@
           // Si esta por debajo, que suba
           _this.y -= _this.velocidad_movimiento;
         }
-        windows.alert(_this.nombre+" ("+_this.x+"; "+_this.y+")");
+        console.log(_this.nombre+" ("+_this.x+"; "+_this.y+")");
       },1000);
     };
-    var caballeroRender;
-    window.onload = function() {
-
-        var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-
-        function distancia(a, b) {
-            var x = Math.abs(a.x-b.x);
-            var y = Math.abs(a.y-b.y);
-            var d = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
-            return d;
-        }
-
-        var intervalo_ataque_caballero;
-        var intervalo_movimiento_caballero;
-        var intervalo_ataque_arquera;
-        var intervalo_movimiento_arquera;
-
-        function preload () {
-
-            game.load.image('fondo', 'IMG/fondo2.jpg');
-            game.load.image('caballero', 'IMG/caballero-min.png');
-            game.load.image('arquera', 'IMG/arquera-min.png');
-
-        }
-	/*var caballero = {
-                nombre: "caballero",
-                vida: 1056,
-                f_ataque: 120,
-                f_defensa:0,
-                velocidad_ataque: 1.1,
-                velocidad_movimiento: 5,
-                alcance: 1,
-                vivo: true,
-                x: Math.floor((Math.random()*(700 - 100))+100),
-                y: Math.floor((Math.random()*(500 - 100))+100),
-                ir_a_objetivo: function(objetivo) {
-		var _this = this;
-		intervalo_movimiento_caballero =  setInterval(function(){
-			if (objetivo.x>_this.x+_this.alcance) {
-				// Si esta por izquiera en x, que se mueva a la der
-				_this.x += _this.velocidad_movimiento;
-			} else if(objetivo.x<_this.x-_this.alcance) {
-				// Si esta por derecha en x, que se mueva a la izq
-				_this.x -= _this.velocidad_movimiento;
-			}
-			if (objetivo.y>_this.y+_this.alcance) {
-				// Si esta por arriba en y, que baje
-				_this.y += _this.velocidad_movimiento
-			} else if(objetivo.y<_this.y-_this.alcance) {
-				// Si esta por debajo, que suba
-				_this.y -= _this.velocidad_movimiento;
-			}
-			windows.alert(_this.nombre+" ("+_this.x+"; "+_this.y+")");
-		},1000);
-	},
-}*/
-
-            var arquera = {
-                nombre: "arquera",
-                vida: 200,
-                f_ataque: 64,
-                f_defensa:0,
-                velocidad_ataque: 1.2,
-                velocidad_movimiento: 5,
-                alcance: 5,
-                vivo: true,
-                x: Math.floor((Math.random()*(700 - 100))+100),
-                y: Math.floor((Math.random()*(500 - 100))+100),
-            }
-            function create () {
-                /*Creamos el fondo con la imagen precargada en preload y con las
-                coordenadas x=0,y=0*/
-                var fondo = game.add.sprite(0, 0, 'fondo');
-
-
-                caballeroRender = game.add.sprite(Math.floor((Math.random()*(700 - 100))+100),Math.floor((Math.random()*(500 - 100))+100), 'caballero');
-                caballeroRender.vida = 1056;
-                caballeroRender.f_ataque =120;
-                caballeroRender.velocidad_ataque = 1.1;
-                caballeroRender.velocidad_movimiento = 5;
-                caballeroRender.alcance = 1;
-                caballeroRender.vivo = true;
-                caballeroRender.ir_a_objetivo = ir_a
-                console.log(caballeroRender);
-                arqueraRender = game.add.sprite(arquera.x, arquera.y, 'arquera');
-                caballeroRender.ir_a_objetivo(arquera);
-            }
+    function caballero_atacar(objetivo) {
+  		console.log(this.nombre+" atacando a "+objetivo.nombre);
+  		objetivo.vida  -= this.f_ataque/this.velocidad_ataque;
+  		if (objetivo.vida<= 0) {
+  			objetivo.vivo = false;
+  			clearInterval(intervalo_ataque_caballero);
+  			console.log(objetivo.nombre+" murio");
+  		}
+  	}
+    function arquera_atacar(objetivo) {
+  		console.log(this.nombre+" atacando a "+objetivo.nombre);
+  		objetivo.vida  -= this.f_ataque/this.velocidad_ataque;
+  		if (objetivo.vida<= 0) {
+  			objetivo.vivo = false;
+  			clearInterval(intervalo_ataque_arquera);
+  			console.log(objetivo.nombre+" murio");
+  		}
+  	}
+    function caballero_comprobar_distancia_con(objetivo) {
+  		var _this = this;
+  		if (distancia(this, objetivo) <= this.alcance) {
+  			clearInterval(intervalo_movimiento_caballero);
+  			intervalo_ataque_caballero = setInterval(function(){
+  				_this.atacar(objetivo);
+          console.log("caballero "+_this.vida+ " y el otro "+objetivo.vida);
+  			},1000);
+  		}
+  	}
+    function arquera_comprobar_distancia_con(objetivo) {
+  		var _this = this;
+  		if (distancia(this, objetivo) <= this.alcance) {
+  			clearInterval(intervalo_movimiento_arquera);
+  			intervalo_ataque_arquera = setInterval(function(){
+  				_this.atacar(objetivo);
+  			},1000);
+  		}
+  	}
 
 
 
-        function update () {
+    // VARIABLE DE INICIACION DE JUEGO
+    var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
-        }
 
-    };
+
+
+    function preload () {
+
+        game.load.image('fondo', 'IMG/fondo2.jpg');
+        game.load.image('caballero', 'IMG/caballero-min.png');
+        game.load.image('arquera', 'IMG/arquera-min.png');
+
+    }
+
+    function create () {
+        /*Creamos el fondo con la imagen precargada en preload y con las
+        coordenadas x=0,y=0*/
+        var fondo = game.add.sprite(0, 0, 'fondo');
+
+        // Agregamos al caballero en posicion random usando el sprite correspondiente
+        var caballeroRender = game.add.sprite(Math.floor((Math.random()*(700 - 100))+100), Math.floor((Math.random()*(500 - 100))+100), 'caballero');
+        // Caracteristicas y metodos del caballero
+        caballeroRender.nombre = "caballero";
+        caballeroRender.vida = 1056;
+        caballeroRender.f_ataque =120;
+        caballeroRender.velocidad_ataque = 1.1;
+        caballeroRender.velocidad_movimiento = 5;
+        caballeroRender.alcance = 1;
+        caballeroRender.vivo = true;
+        caballeroRender.ir_a_objetivo = ir_a; // Le pasamos la funcion del principio
+        caballeroRender.comprobar_distancia_con = caballero_comprobar_distancia_con;
+        caballeroRender.atacar = caballero_atacar;
+
+        // Agregamos a la arquera en posicion random usando el sprite correspondiente
+        var arqueraRender = game.add.sprite(Math.floor((Math.random()*(700 - 100))+100), Math.floor((Math.random()*(500 - 100))+100), 'arquera');
+        // Caracteristicas y metodos de la arquera
+        arqueraRender.nombre = "arquera";
+        arqueraRender.vida = 200;
+        arqueraRender.f_ataque = 64;
+        arqueraRender.velocidad_ataque = 1.2;
+        arqueraRender.velocidad_movimiento = 5;
+        arqueraRender.alcance = 5;
+        arqueraRender.vivo = true;
+        arqueraRender.ir_a_objetivo = ir_a; // Le pasamos la funcion del principio
+        arqueraRender.comprobar_distancia_con = arquera_comprobar_distancia_con;
+        arqueraRender.atacar = arquera_atacar;
+
+
+        caballeroRender.ir_a_objetivo(arqueraRender);
+        caballeroRender.comprobar_distancia_con(arqueraRender);
+        arqueraRender.ir_a_objetivo(caballeroRender);
+        arqueraRender.comprobar_distancia_con(caballeroRender);
+    }
+
+    function update () {
+
+    }
 
     </script>
 
